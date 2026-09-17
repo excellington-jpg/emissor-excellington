@@ -706,7 +706,9 @@
                     id: 'doc_' + Date.now(),
                     date: new Date().toLocaleString('pt-BR'),
                     tab: data.tab,
+                    templateKey: data.templateKey,
                     title: data.title,
+                    fields: data.fields,
                     summary: getDocumentSummary(data),
                     htmlContent: htmlContent
                 };
@@ -761,7 +763,10 @@
                             <h4 class="font-bold text-sm text-excellington-900">${item.title}</h4>
                             <p class="text-xs text-slate-600">${item.summary}</p>
                         </div>
-                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
+                            <button onclick="loadHistoryItemIntoForm('${item.id}')" class="px-3.5 py-2 bg-sky-100 hover:bg-sky-200 text-sky-900 font-semibold text-xs rounded-xl transition flex items-center gap-1.5" title="Carregar e Editar">
+                                <i class="fa-solid fa-pen-to-square"></i> Carregar e Editar
+                            </button>
                             <button onclick="previewHistoryItem('${item.id}')" class="px-3.5 py-2 bg-excellington-100 hover:bg-excellington-200 text-excellington-800 font-semibold text-xs rounded-xl transition flex items-center gap-1.5" title="Visualizar">
                                 <i class="fa-solid fa-eye"></i> Visualizar
                             </button>
@@ -776,6 +781,39 @@
                 `;
             });
             container.innerHTML = html;
+        }
+
+        function loadHistoryItemIntoForm(id) {
+            const history = JSON.parse(localStorage.getItem('excellington_history') || '[]');
+            const item = history.find(h => h.id === id);
+            if (!item) return;
+
+            // 1. Switch to correct tab
+            switchTab(item.tab);
+
+            // 2. Set model selector if templateKey exists
+            if (item.templateKey) {
+                const selectEl = document.getElementById(`${item.tab}-modelo`);
+                if (selectEl) {
+                    selectEl.value = item.templateKey;
+                }
+            }
+
+            // 3. Update form fields for this template
+            updateTemplateFields(item.tab);
+
+            // 4. Populate field values into form and localStorage
+            if (item.fields) {
+                for (const [fieldId, val] of Object.entries(item.fields)) {
+                    const el = document.getElementById(`field_${fieldId}`);
+                    if (el) {
+                        el.value = val;
+                        localStorage.setItem(`excellington_${item.tab}_${item.templateKey}_${fieldId}`, val);
+                    }
+                }
+            }
+
+            showToast("Documento carregado no formulário para edição!", "success");
         }
 
         function previewHistoryItem(id) {
