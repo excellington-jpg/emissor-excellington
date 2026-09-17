@@ -499,14 +499,17 @@
         function buildDocumentHTML(data) {
             const f = data.fields;
             let bodyHTML = '';
+            const docTitle = (data.title || 'DOCUMENTO').toUpperCase();
 
             if (data.tab === 'orcamento') {
+                bodyHTML += `
+                    <div class="text-center mb-5 border-b-2 border-excellington-300 pb-3">
+                        <h2 class="text-xl font-bold uppercase tracking-wide text-sky-900">${docTitle}</h2>
+                        <p class="text-[11px] text-slate-500 mt-0.5">Transação entre Particulares (Pessoas Físicas)</p>
+                    </div>
+                `;
                 if (data.templateKey === 'servico') {
-                    bodyHTML = `
-                        <div class="text-center mb-5 border-b-2 border-excellington-300 pb-3">
-                            <h2 class="text-xl font-bold uppercase tracking-wide text-sky-900">ORÇAMENTO DE PRESTAÇÃO DE SERVIÇOS</h2>
-                            <p class="text-[11px] text-slate-500 mt-0.5">Transação entre Particulares (Pessoas Físicas)</p>
-                        </div>
+                    bodyHTML += `
                         <div class="grid grid-cols-2 gap-3 mb-4 text-xs bg-sky-50 p-3.5 rounded-xl border border-sky-100">
                             <div><strong>Prestador (Emitente):</strong><br>${f.emit_nome || '---'}<br>CPF: ${f.emit_cpf || '---'}<br>Tel: ${f.emit_tel || '---'}</div>
                             <div><strong>Cliente:</strong><br>${f.cli_nome || '---'}<br>CPF: ${f.cli_cpf || '---'}</div>
@@ -524,11 +527,7 @@
                         </div>
                     `;
                 } else {
-                    bodyHTML = `
-                        <div class="text-center mb-5 border-b-2 border-excellington-300 pb-3">
-                            <h2 class="text-xl font-bold uppercase tracking-wide text-sky-900">ORÇAMENTO DE VENDA DE BEM MÓVEL</h2>
-                            <p class="text-[11px] text-slate-500 mt-0.5">Transação entre Particulares (Pessoas Físicas)</p>
-                        </div>
+                    bodyHTML += `
                         <div class="grid grid-cols-2 gap-3 mb-4 text-xs bg-sky-50 p-3.5 rounded-xl border border-sky-100">
                             <div><strong>Vendedor (Emitente):</strong><br>${f.emit_nome || '---'}<br>CPF: ${f.emit_cpf || '---'}<br>Tel: ${f.emit_tel || '---'}</div>
                             <div><strong>Comprador:</strong><br>${f.cli_nome || '---'}<br>CPF: ${f.cli_cpf || '---'}</div>
@@ -563,7 +562,7 @@
 
                 bodyHTML = `
                     <div class="text-center mb-5 border-b-2 border-excellington-300 pb-3">
-                        <h2 class="text-xl font-bold uppercase tracking-wide text-sky-900">RECIBO DE PAGAMENTO</h2>
+                        <h2 class="text-xl font-bold uppercase tracking-wide text-sky-900">${docTitle}</h2>
                         <p class="text-[11px] text-slate-500 mt-0.5">Comprovante de Transação entre Pessoas Físicas</p>
                     </div>
                     <div class="my-4 p-5 bg-sky-50 rounded-xl border border-sky-100 text-center">
@@ -586,7 +585,7 @@
                     <div class="border-2 border-slate-800 p-5 rounded-xl bg-white shadow-sm relative">
                         <div class="flex justify-between items-start border-b border-slate-300 pb-3 mb-3">
                             <div>
-                                <h2 class="text-lg font-black uppercase tracking-wider text-slate-900">NOTA PROMISSÓRIA</h2>
+                                <h2 class="text-lg font-black uppercase tracking-wider text-slate-900">${docTitle}</h2>
                                 <p class="text-[11px] text-slate-500">Nº ${f.prom_num || '001'} | Vencimento: ${f.prom_vencimento_data || f.prom_vencimento || 'À Vista'}</p>
                             </div>
                             <div class="text-right bg-sky-50 px-3 py-1.5 rounded-lg border border-sky-200">
