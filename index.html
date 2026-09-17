@@ -1,0 +1,716 @@
+﻿
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orçamentos, Recibos e Promissórias Excellington</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        excellington: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+        @media print {
+            body { background: white !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .pdf-container {
+                width: 190mm !important;
+                max-width: 190mm !important;
+                margin: 0 auto !important;
+                box-shadow: none !important;
+                page-break-inside: avoid !important;
+            }
+        }
+        .pdf-container {
+            width: 100%;
+            max-width: 190mm;
+            margin: 0 auto;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body class="h-full bg-excellington-50 text-excellington-900 font-sans flex flex-col justify-between antialiased selection:bg-excellington-200">
+
+    <header class="bg-white border-b border-excellington-200 shadow-sm sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-excellington-100 rounded-2xl flex items-center justify-center text-excellington-700 shadow-inner">
+                    <i class="fa-solid fa-file-invoice-dollar text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-excellington-900">Excellington</h1>
+                    <p class="text-xs sm:text-sm text-excellington-600 font-medium">Emissão de Orçamentos, Recibos e Promissórias (Pessoa Física)</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="openTermsModal()" class="inline-flex items-center space-x-1.5 px-3 py-2 text-xs sm:text-sm font-semibold text-excellington-700 bg-excellington-100 hover:bg-excellington-200 rounded-xl transition shadow-sm">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span class="hidden sm:inline">Termos e Uso</span>
+                </button>
+                <button onclick="closeAppWindow()" class="inline-flex items-center space-x-1.5 px-3 py-2 text-xs sm:text-sm font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition shadow-sm" title="Fechar Janela">
+                    <i class="fa-solid fa-power-off"></i>
+                    <span class="hidden sm:inline">Fechar</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Tab Navigation Bar -->
+        <div class="flex flex-wrap gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-excellington-200">
+            <button onclick="switchTab('orcamento')" id="btn-tab-orcamento" class="flex-1 min-w-[140px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 bg-excellington-600 text-white shadow-md">
+                <i class="fa-solid fa-calculator"></i>
+                <span>Orçamentos</span>
+            </button>
+            <button onclick="switchTab('recibo')" id="btn-tab-recibo" class="flex-1 min-w-[140px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 text-excellington-700 hover:bg-excellington-100">
+                <i class="fa-solid fa-receipt"></i>
+                <span>Recibos</span>
+            </button>
+            <button onclick="switchTab('promissoria')" id="btn-tab-promissoria" class="flex-1 min-w-[140px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 text-excellington-700 hover:bg-excellington-100">
+                <i class="fa-solid fa-file-contract"></i>
+                <span>Notas Promissórias</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-8">
+
+            <!-- ORÇAMENTO TAB CONTENT -->
+            <div id="tab-orcamento" class="document-tab bg-white rounded-3xl shadow-sm border border-excellington-200 p-6 sm:p-8">
+                <div class="mb-6 border-b border-excellington-100 pb-4">
+                    <h2 class="text-xl font-bold text-excellington-900 flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-excellington-600"></i> Emitir Orçamento entre Pessoas Físicas
+                    </h2>
+                    <p class="text-sm text-excellington-600 mt-1">Selecione o modelo desejado e preencha as informações para gerar o orçamento.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-excellington-800 mb-2">Modelo de Orçamento</label>
+                        <select id="orcamento-modelo" onchange="updateTemplateFields('orcamento')" class="w-full bg-excellington-50 border border-excellington-200 rounded-xl px-4 py-3 text-excellington-900 focus:outline-none focus:ring-2 focus:ring-excellington-500 font-medium">
+                            <option value="servico">Modelo 1: Prestação de Serviços (Autônomo / Particular)</option>
+                            <option value="bem">Modelo 2: Venda de Bem Móvel (Ex: Veículo, Eletrodoméstico, etc.)</option>
+                        </select>
+                    </div>
+
+                    <!-- Dynamic Form Container for Orcamento -->
+                    <div id="form-fields-orcamento" class="space-y-4">
+                        <!-- Injected via JavaScript -->
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="flex flex-wrap gap-4 pt-4 border-t border-excellington-100">
+                        <button type="button" onclick="previewDocument('orcamento')" class="flex-1 bg-excellington-600 hover:bg-excellington-700 text-white font-semibold py-3.5 px-6 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-eye"></i>
+                            <span>Visualizar Modelo Pronto</span>
+                        </button>
+                        <button type="button" onclick="generatePDF('orcamento')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 px-6 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Emitir e Baixar PDF</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECIBO TAB CONTENT -->
+            <div id="tab-recibo" class="document-tab hidden bg-white rounded-3xl shadow-sm border border-excellington-200 p-6 sm:p-8">
+                <div class="mb-6 border-b border-excellington-100 pb-4">
+                    <h2 class="text-xl font-bold text-excellington-900 flex items-center gap-2">
+                        <i class="fa-solid fa-receipt text-excellington-600"></i> Emitir Recibo de Pagamento (Pessoa Física)
+                    </h2>
+                    <p class="text-sm text-excellington-600 mt-1">Escolha o modelo de recibo adequado para comprovar a quitação de valores.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-excellington-800 mb-2">Modelo de Recibo</label>
+                        <select id="recibo-modelo" onchange="updateTemplateFields('recibo')" class="w-full bg-excellington-50 border border-excellington-200 rounded-xl px-4 py-3 text-excellington-900 focus:outline-none focus:ring-2 focus:ring-excellington-500 font-medium">
+                            <option value="simples">Modelo 1: Recibo de Pagamento Simples / Geral</option>
+                            <option value="aluguel">Modelo 2: Recibo de Aluguel / Locação Residencial</option>
+                            <option value="servico">Modelo 3: Recibo de Quitação de Serviço Autônomo</option>
+                        </select>
+                    </div>
+
+                    <!-- Dynamic Form Container for Recibo -->
+                    <div id="form-fields-recibo" class="space-y-4">
+                        <!-- Injected via JavaScript -->
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="flex flex-wrap gap-4 pt-4 border-t border-excellington-100">
+                        <button type="button" onclick="previewDocument('recibo')" class="flex-1 bg-excellington-600 hover:bg-excellington-700 text-white font-semibold py-3.5 px-6 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-eye"></i>
+                            <span>Visualizar Modelo Pronto</span>
+                        </button>
+                        <button type="button" onclick="generatePDF('recibo')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 px-6 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Emitir e Baixar PDF</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOTA PROMISSÓRIA TAB CONTENT -->
+            <div id="tab-promissoria" class="document-tab hidden bg-white rounded-3xl shadow-sm border border-excellington-200 p-6 sm:p-8">
+                <div class="mb-6 border-b border-excellington-100 pb-4">
+                    <h2 class="text-xl font-bold text-excellington-900 flex items-center gap-2">
+                        <i class="fa-solid fa-file-contract text-excellington-600"></i> Emitir Nota Promissória (Pessoa Física)
+                    </h2>
+                    <p class="text-sm text-excellington-600 mt-1">Preencha os dados da promessa de pagamento com total segurança jurídica entre particulares.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-excellington-800 mb-2">Modelo de Nota Promissória</label>
+                        <select id="promissoria-modelo" onchange="updateTemplateFields('promissoria')" class="w-full bg-excellington-50 border border-excellington-200 rounded-xl px-4 py-3 text-excellington-900 focus:outline-none focus:ring-2 focus:ring-excellington-500 font-medium">
+                            <option value="avista">Modelo 1: Nota Promissória Pagável à Vista</option>
+                            <option value="parcelada">Modelo 2: Nota Promissória com Vencimento Determinado / Parcela</option>
+                        </select>
+                    </div>
+
+                    <!-- Dynamic Form Container for Promissoria -->
+                    <div id="form-fields-promissoria" class="space-y-4">
+                        <!-- Injected via JavaScript -->
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="flex flex-wrap gap-4 pt-4 border-t border-excellington-100">
+                        <button type="button" onclick="previewDocument('promissoria')" class="flex-1 bg-excellington-600 hover:bg-excellington-700 text-white font-semibold py-3.5 px-6 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-eye"></i>
+                            <span>Visualizar Modelo Pronto</span>
+                        </button>
+                        <button type="button" onclick="generatePDF('promissoria')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 px-6 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Emitir e Baixar PDF</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-excellington-200 py-6 mt-12 text-center text-xs text-excellington-600">
+        <p>Orçamentos, Recibos e Promissórias Excellington &copy; 2026. Todos os dados são processados e armazenados localmente no seu dispositivo.</p>
+    </footer>
+
+    <!-- PREVIEW MODAL -->
+    <div id="preview-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-excellington-200">
+            <div class="flex items-center justify-between px-6 py-4 bg-excellington-100 border-b border-excellington-200">
+                <h3 class="font-bold text-lg text-excellington-900 flex items-center gap-2">
+                    <i class="fa-solid fa-file-lines text-excellington-600"></i> Pré-Visualização do Documento (Formato A4)
+                </h3>
+                <button type="button" onclick="closePreviewModal()" class="w-8 h-8 rounded-full bg-excellington-200 hover:bg-excellington-300 text-excellington-800 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div id="preview-content-area" class="p-8 overflow-y-auto flex-grow bg-slate-100 text-slate-800 font-serif flex justify-center">
+                <!-- Document body injected here -->
+            </div>
+
+            <div class="px-6 py-4 bg-white border-t border-excellington-200 flex justify-end space-x-3">
+                <button type="button" onclick="closePreviewModal()" class="px-5 py-2.5 rounded-xl border border-excellington-300 text-excellington-700 font-semibold text-sm hover:bg-excellington-50 transition">
+                    Fechar Prévia
+                </button>
+                <button type="button" onclick="confirmAndDownloadFromPreview()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-md transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i> Baixar PDF Agora
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TERMS & RESPONSIBILITY MODAL -->
+    <div id="terms-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-excellington-200">
+            <div class="flex items-center justify-between px-6 py-4 bg-excellington-100 border-b border-excellington-200">
+                <h3 class="font-bold text-lg text-excellington-900 flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved text-excellington-600"></i> Termo de Uso e Responsabilidade
+                </h3>
+                <button type="button" onclick="closeTermsModal()" class="w-8 h-8 rounded-full bg-excellington-200 hover:bg-excellington-300 text-excellington-800 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto flex-grow space-y-4 text-sm text-excellington-800">
+                <p><strong>1. Natureza da Aplicação:</strong> O aplicativo <em>Orçamentos, Recibos e Promissórias Excellington</em> foi desenvolvido estritamente para facilitar a emissão de documentos particulares entre pessoas físicas (sem exigência de CNPJ, não configurando nota fiscal eletrônica ou cupom fiscal obrigatório para empresas).</p>
+                <p><strong>2. Armazenamento Local de Dados:</strong> Todos os dados inseridos nos campos são processados exclusivamente no navegador do usuário e podem ser salvos no armazenamento local (<small>localStorage</small>) do seu próprio dispositivo. Nenhum dado é enviado, coletado ou armazenado em servidores externos.</p>
+                <p><strong>3. Responsabilidade Jurídica:</strong> Os modelos fornecidos servem como minuta padrão. As partes envolvidas na transação são inteiramente responsáveis pela veracidade das informações, cumprimento de obrigações e validade jurídica do negócio pactuado.</p>
+                <p><strong>4. Assinatura:</strong> Os documentos gerados possuem espaço adequado para aposição de assinatura manuscrita (em caso de impressão) ou assinatura eletrônica (como GOV.BR).</p>
+            </div>
+
+            <div class="px-6 py-4 bg-excellington-50 border-t border-excellington-200 flex justify-end">
+                <button type="button" onclick="closeTermsModal()" class="px-6 py-2.5 rounded-xl bg-excellington-600 hover:bg-excellington-700 text-white font-semibold text-sm shadow-md transition">
+                    Entendi e Concordo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <script>
+        // Global state for current active tab
+        let currentTab = 'orcamento';
+
+        // Template definitions with fields
+        const templatesData = {
+            orcamento: {
+                servico: {
+                    title: "Orçamento de Prestação de Serviços (Pessoa Física)",
+                    fields: [
+                        { id: 'emit_nome', label: 'Nome do Prestador (Emitente)', type: 'text', placeholder: 'Ex: Carlos Silva' },
+                        { id: 'emit_cpf', label: 'CPF do Prestador', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'emit_tel', label: 'Telefone / Contato', type: 'text', placeholder: '(00) 90000-0000' },
+                        { id: 'cli_nome', label: 'Nome do Cliente', type: 'text', placeholder: 'Ex: Maria Oliveira' },
+                        { id: 'cli_cpf', label: 'CPF do Cliente', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'serv_desc', label: 'Descrição Detalhada do Serviço', type: 'textarea', placeholder: 'Ex: Reforma de pintura residencial na sala e quartos...' },
+                        { id: 'serv_valor', label: 'Valor Total (R$)', type: 'text', placeholder: '1.500,00' },
+                        { id: 'serv_validade', label: 'Validade do Orçamento (Dias)', type: 'text', placeholder: '10 dias' },
+                        { id: 'serv_cond', label: 'Condições de Pagamento', type: 'text', placeholder: '50% de entrada e 50% na entrega' }
+                    ]
+                },
+                bem: {
+                    title: "Orçamento de Venda de Bem Móvel (Particular)",
+                    fields: [
+                        { id: 'emit_nome', label: 'Nome do Vendedor (Emitente)', type: 'text', placeholder: 'Ex: João Pereira' },
+                        { id: 'emit_cpf', label: 'CPF do Vendedor', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'emit_tel', label: 'Telefone do Vendedor', type: 'text', placeholder: '(00) 90000-0000' },
+                        { id: 'cli_nome', label: 'Nome do Comprador', type: 'text', placeholder: 'Ex: Ana Souza' },
+                        { id: 'cli_cpf', label: 'CPF do Comprador', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'bem_desc', label: 'Descrição do Bem (Ex: Moto, Aparelho, Móvel)', type: 'textarea', placeholder: 'Ex: Geladeira Brastemp Frost Free 400L em bom estado...' },
+                        { id: 'bem_valor', label: 'Preço Proposto (R$)', type: 'text', placeholder: '2.200,00' },
+                        { id: 'bem_local', label: 'Local de Retirada / Entrega', type: 'text', placeholder: 'Endereço do Vendedor ou combinar' },
+                        { id: 'bem_obs', label: 'Observações Gerais', type: 'text', placeholder: 'Pagamento à vista via PIX' }
+                    ]
+                }
+            },
+            recibo: {
+                simples: {
+                    title: "Recibo de Pagamento Simples / Geral",
+                    fields: [
+                        { id: 'rec_valor_num', label: 'Valor Numérico (R$)', type: 'text', placeholder: '350,00' },
+                        { id: 'rec_valor_ext', label: 'Valor por Extenso', type: 'text', placeholder: 'Trezentos e cinquenta reais' },
+                        { id: 'rec_recebedor', label: 'Recebido de (Nome do Pagador)', type: 'text', placeholder: 'Ex: Pedro Santos' },
+                        { id: 'rec_pagador_cpf', label: 'CPF do Pagador', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'rec_ref', label: 'Referente a (Motivo/Histórico)', type: 'text', placeholder: 'Ex: Pagamento referente a conserto de portão' },
+                        { id: 'emit_nome', label: 'Nome do Credor (Quem Recebeu)', type: 'text', placeholder: 'Ex: Marcos Lima' },
+                        { id: 'emit_cpf', label: 'CPF do Credor', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'cidade_data', label: 'Local e Data', type: 'text', placeholder: 'Ex: Januária - MG, 17 de setembro de 2026' }
+                    ]
+                },
+                aluguel: {
+                    title: "Recibo de Aluguel / Locação Residencial",
+                    fields: [
+                        { id: 'loc_valor_num', label: 'Valor do Aluguel (R$)', type: 'text', placeholder: '1.200,00' },
+                        { id: 'loc_valor_ext', label: 'Valor por Extenso', type: 'text', placeholder: 'Um mil e duzentos reais' },
+                        { id: 'loc_inquilino', label: 'Nome do Inquilino (Locatário)', type: 'text', placeholder: 'Ex: Juliana Ribeiro' },
+                        { id: 'loc_inquilino_cpf', label: 'CPF do Inquilino', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'loc_imovel', label: 'Endereço do Imóvel Locado', type: 'text', placeholder: 'Rua Principal, nº 123, Centro' },
+                        { id: 'loc_periodo', label: 'Período de Referência', type: 'text', placeholder: 'Mês de Referência: Agosto/2026' },
+                        { id: 'emit_nome', label: 'Nome do Proprietário (Locador)', type: 'text', placeholder: 'Ex: Roberto Alves' },
+                        { id: 'emit_cpf', label: 'CPF do Proprietário', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'cidade_data', label: 'Local e Data', type: 'text', placeholder: 'Ex: Januária - MG, 17 de setembro de 2026' }
+                    ]
+                },
+                servico: {
+                    title: "Recibo de Quitação de Serviço Autônomo",
+                    fields: [
+                        { id: 'serv_val_num', label: 'Valor Quitado (R$)', type: 'text', placeholder: '850,00' },
+                        { id: 'serv_val_ext', label: 'Valor por Extenso', type: 'text', placeholder: 'Oitocentos e cinquenta reais' },
+                        { id: 'serv_contratante', label: 'Nome do Contratante', type: 'text', placeholder: 'Ex: Beatriz Mendes' },
+                        { id: 'serv_detalhe', label: 'Serviço Executado', type: 'text', placeholder: 'Ex: Limpeza e manutenção de jardim' },
+                        { id: 'emit_nome', label: 'Nome do Prestador Autônomo', type: 'text', placeholder: 'Ex: Lucas Martins' },
+                        { id: 'emit_cpf', label: 'CPF do Prestador', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'cidade_data', label: 'Local e Data', type: 'text', placeholder: 'Ex: Januária - MG, 17 de setembro de 2026' }
+                    ]
+                }
+            },
+            promissoria: {
+                avista: {
+                    title: "Nota Promissória à Vista",
+                    fields: [
+                        { id: 'prom_num', label: 'Número da Nota Promissória', type: 'text', placeholder: '001/2026' },
+                        { id: 'prom_valor_num', label: 'Valor (R$)', type: 'text', placeholder: '2.500,00' },
+                        { id: 'prom_valor_ext', label: 'Valor por Extenso', type: 'text', placeholder: 'Dois mil e quinhentos reais' },
+                        { id: 'prom_vencimento', label: 'Condição de Vencimento', type: 'text', placeholder: 'Paguem por esta única via de NOTA PROMISSÓRIA À VISTA' },
+                        { id: 'cred_nome', label: 'A quem se deve pagar (Credor)', type: 'text', placeholder: 'Ex: Fernando Cardoso' },
+                        { id: 'cred_cpf', label: 'CPF do Credor', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'devedor_nome', label: 'Nome do Emitente (Devedor)', type: 'text', placeholder: 'Ex: Gabriel Nogueira' },
+                        { id: 'devedor_cpf', label: 'CPF do Devedor', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'devedor_end', label: 'Endereço Completo do Devedor', type: 'text', placeholder: 'Rua das Flores, 45 - Bairro, Cidade - MG' },
+                        { id: 'cidade_data', label: 'Local e Data de Emissão', type: 'text', placeholder: 'Januária - MG, 17 de setembro de 2026' }
+                    ]
+                },
+                parcelada: {
+                    title: "Nota Promissória com Vencimento Determinado",
+                    fields: [
+                        { id: 'prom_num', label: 'Número / Parcela (Ex: 01/03)', type: 'text', placeholder: '01/03' },
+                        { id: 'prom_valor_num', label: 'Valor da Parcela (R$)', type: 'text', placeholder: '500,00' },
+                        { id: 'prom_valor_ext', label: 'Valor por Extenso', type: 'text', placeholder: 'Quinhentos reais' },
+                        { id: 'prom_vencimento_data', label: 'Data de Vencimento Específica', type: 'text', placeholder: '17/10/2026' },
+                        { id: 'cred_nome', label: 'A quem se deve pagar (Credor)', type: 'text', placeholder: 'Ex: Fernando Cardoso' },
+                        { id: 'cred_cpf', label: 'CPF do Credor', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'devedor_nome', label: 'Nome do Emitente (Devedor)', type: 'text', placeholder: 'Ex: Gabriel Nogueira' },
+                        { id: 'devedor_cpf', label: 'CPF do Devedor', type: 'text', placeholder: '000.000.000-00' },
+                        { id: 'devedor_end', label: 'Endereço Completo do Devedor', type: 'text', placeholder: 'Rua das Flores, 45 - Bairro, Cidade - MG' },
+                        { id: 'cidade_data', label: 'Local e Data de Emissão', type: 'text', placeholder: 'Januária - MG, 17 de setembro de 2026' }
+                    ]
+                }
+            }
+        };
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            currentTab = tabName;
+            ['orcamento', 'recibo', 'promissoria'].forEach(t => {
+                const tabEl = document.getElementById(`tab-${t}`);
+                const btnEl = document.getElementById(`btn-tab-${t}`);
+                if (t === tabName) {
+                    tabEl.classList.remove('hidden');
+                    btnEl.className = "flex-1 min-w-[140px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 bg-excellington-600 text-white shadow-md";
+                } else {
+                    tabEl.classList.add('hidden');
+                    btnEl.className = "flex-1 min-w-[140px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 text-excellington-700 hover:bg-excellington-100";
+                }
+            });
+            updateTemplateFields(tabName);
+        }
+
+        // Render dynamic form fields based on selected template
+        function updateTemplateFields(tab) {
+            const selectEl = document.getElementById(`${tab}-modelo`);
+            if (!selectEl) return;
+            const templateKey = selectEl.value;
+            const container = document.getElementById(`form-fields-${tab}`);
+            const template = templatesData[tab][templateKey];
+
+            let html = '';
+            template.fields.forEach(field => {
+                const savedVal = localStorage.getItem(`excellington_${tab}_${templateKey}_${field.id}`) || '';
+                if (field.type === 'textarea') {
+                    html += `
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-excellington-700 mb-1">${field.label}</label>
+                            <textarea id="field_${field.id}" oninput="saveFieldValue('${tab}', '${templateKey}', '${field.id}')" rows="3" class="w-full bg-excellington-50 border border-excellington-200 rounded-xl px-4 py-2.5 text-excellington-900 focus:outline-none focus:ring-2 focus:ring-excellington-500 font-medium" placeholder="${field.placeholder}">${savedVal}</textarea>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-excellington-700 mb-1">${field.label}</label>
+                            <input type="text" id="field_${field.id}" value="${savedVal}" oninput="saveFieldValue('${tab}', '${templateKey}', '${field.id}')" class="w-full bg-excellington-50 border border-excellington-200 rounded-xl px-4 py-2.5 text-excellington-900 focus:outline-none focus:ring-2 focus:ring-excellington-500 font-medium" placeholder="${field.placeholder}">
+                        </div>
+                    `;
+                }
+            });
+            container.innerHTML = html;
+        }
+
+        // Save field data to localStorage automatically for user convenience
+        function saveFieldValue(tab, templateKey, fieldId) {
+            const el = document.getElementById(`field_${fieldId}`);
+            if (el) {
+                localStorage.setItem(`excellington_${tab}_${templateKey}_${fieldId}`, el.value);
+            }
+        }
+
+        // Gather all current form field values robustly
+        function getFormData(tab) {
+            const selectEl = document.getElementById(`${tab}-modelo`);
+            const templateKey = selectEl ? selectEl.value : (tab === 'orcamento' ? 'servico' : (tab === 'recibo' ? 'simples' : 'avista'));
+            const template = templatesData[tab][templateKey];
+            const data = { tab, templateKey, title: template.title, fields: {} };
+            
+            template.fields.forEach(field => {
+                const el = document.getElementById(`field_${field.id}`);
+                data.fields[field.id] = el ? el.value : (localStorage.getItem(`excellington_${tab}_${templateKey}_${field.id}`) || '');
+            });
+            return data;
+        }
+
+        // Build HTML markup for preview and PDF export with strict A4 dimensions & page-break safeguards
+        function buildDocumentHTML(data) {
+            const f = data.fields;
+            let bodyHTML = '';
+
+            if (data.tab === 'orcamento') {
+                if (data.templateKey === 'servico') {
+                    bodyHTML = `
+                        <div class="text-center mb-5 border-b-2 border-excellington-300 pb-3">
+                            <h2 class="text-xl font-bold uppercase tracking-wide text-sky-900">ORÇAMENTO DE PRESTAÇÃO DE SERVIÇOS</h2>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Transação entre Particulares (Pessoas Físicas)</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-4 text-xs bg-sky-50 p-3.5 rounded-xl border border-sky-100">
+                            <div><strong>Prestador (Emitente):</strong><br>${f.emit_nome || '---'}<br>CPF: ${f.emit_cpf || '---'}<br>Tel: ${f.emit_tel || '---'}</div>
+                            <div><strong>Cliente:</strong><br>${f.cli_nome || '---'}<br>CPF: ${f.cli_cpf || '---'}</div>
+                        </div>
+                        <div class="mb-4">
+                            <h4 class="font-bold text-xs text-sky-900 mb-1.5 uppercase border-b border-slate-200 pb-1">Descrição do Serviço</h4>
+                            <p class="whitespace-pre-line text-xs text-slate-700 bg-white p-3.5 rounded-xl border border-slate-200 min-h-[70px]">${f.serv_desc || '---'}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-4 text-xs">
+                            <div class="bg-white p-3 rounded-xl border border-slate-200"><strong>Valor Total:</strong> <span class="text-base font-bold text-emerald-700">R$ ${f.serv_valor || '0,00'}</span></div>
+                            <div class="bg-white p-3 rounded-xl border border-slate-200"><strong>Validade:</strong> ${f.serv_validade || '---'}</div>
+                        </div>
+                        <div class="mb-5 text-xs bg-white p-3 rounded-xl border border-slate-200">
+                            <strong>Condições de Pagamento:</strong> ${f.serv_cond || '---'}
+                        </div>
+                    `;
+                } else {
+                    bodyHTML = `
+                        <div class="text-center mb-5 border-b-2 border-excellington-300 pb-3">
+                            <h2 class="text-xl font-bold uppercase tracking-wide text-sky-900">ORÇAMENTO DE VENDA DE BEM MÓVEL</h2>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Transação entre Particulares (Pessoas Físicas)</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-4 text-xs bg-sky-50 p-3.5 rounded-xl border border-sky-100">
+                            <div><strong>Vendedor (Emitente):</strong><br>${f.emit_nome || '---'}<br>CPF: ${f.emit_cpf || '---'}<br>Tel: ${f.emit_tel || '---'}</div>
+                            <div><strong>Comprador:</strong><br>${f.cli_nome || '---'}<br>CPF: ${f.cli_cpf || '---'}</div>
+                        </div>
+                        <div class="mb-4">
+                            <h4 class="font-bold text-xs text-sky-900 mb-1.5 uppercase border-b border-slate-200 pb-1">Descrição do Bem</h4>
+                            <p class="whitespace-pre-line text-xs text-slate-700 bg-white p-3.5 rounded-xl border border-slate-200 min-h-[70px]">${f.bem_desc || '---'}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-4 text-xs">
+                            <div class="bg-white p-3 rounded-xl border border-slate-200"><strong>Preço Proposto:</strong> <span class="text-base font-bold text-emerald-700">R$ ${f.bem_valor || '0,00'}</span></div>
+                            <div class="bg-white p-3 rounded-xl border border-slate-200"><strong>Local de Retirada:</strong> ${f.bem_local || '---'}</div>
+                        </div>
+                        <div class="mb-5 text-xs bg-white p-3 rounded-xl border border-slate-200">
+                            <strong>Observações:</strong> ${f.bem_obs || '---'}
+                        </div>
+                    `;
+                }
+            } else if (data.tab === 'recibo') {
+                let refText = '---';
+                if (data.templateKey === 'simples') {
+                    refText = f.rec_ref || '---';
+                } else if (data.templateKey === 'aluguel') {
+                    refText = (f.loc_imovel || 'Imóvel') + (f.loc_periodo ? ' - Período: ' + f.loc_periodo : '');
+                } else if (data.templateKey === 'servico') {
+                    refText = f.serv_detalhe || '---';
+                }
+
+                const valorNum = f.rec_valor_num || f.loc_valor_num || f.serv_val_num || '0,00';
+                const valorExt = f.rec_valor_ext || f.loc_valor_ext || f.serv_val_ext || '---';
+                const pagadorNome = f.rec_recebedor || f.loc_inquilino || f.serv_contratante || '---';
+                const pagadorCpf = f.rec_pagador_cpf || f.loc_inquilino_cpf || '---';
+
+                bodyHTML = `
+                    <div class="text-center mb-5 border-b-2 border-excellington-300 pb-3">
+                        <h2 class="text-xl font-bold uppercase tracking-wide text-sky-900">RECIBO DE PAGAMENTO</h2>
+                        <p class="text-[11px] text-slate-500 mt-0.5">Comprovante de Transação entre Pessoas Físicas</p>
+                    </div>
+                    <div class="my-4 p-5 bg-sky-50 rounded-xl border border-sky-100 text-center">
+                        <span class="text-[11px] uppercase tracking-widest text-sky-800 font-bold block mb-1">Valor Quitado</span>
+                        <span class="text-2xl font-extrabold text-emerald-700">R$ ${valorNum}</span>
+                        <p class="text-xs italic text-slate-600 mt-1.5">(${valorExt})</p>
+                    </div>
+                    <div class="mb-5 text-xs leading-relaxed text-slate-700 bg-white p-5 rounded-xl border border-slate-200">
+                        Recebi(emos) de <strong>${pagadorNome}</strong> 
+                        (CPF: ${pagadorCpf}), a quantia acima especificada, referente a: 
+                        <br><br>
+                        <span class="font-semibold text-sky-900 bg-sky-50 px-3 py-1.5 rounded-lg block">${refText}</span>
+                    </div>
+                    <div class="mb-4 text-right text-xs font-medium text-slate-600">
+                        ${f.cidade_data || 'Local e Data não informados'}
+                    </div>
+                `;
+            } else if (data.tab === 'promissoria') {
+                bodyHTML = `
+                    <div class="border-2 border-slate-800 p-5 rounded-xl bg-white shadow-sm relative">
+                        <div class="flex justify-between items-start border-b border-slate-300 pb-3 mb-3">
+                            <div>
+                                <h2 class="text-lg font-black uppercase tracking-wider text-slate-900">NOTA PROMISSÓRIA</h2>
+                                <p class="text-[11px] text-slate-500">Nº ${f.prom_num || '001'} | Vencimento: ${f.prom_vencimento_data || f.prom_vencimento || 'À Vista'}</p>
+                            </div>
+                            <div class="text-right bg-sky-50 px-3 py-1.5 rounded-lg border border-sky-200">
+                                <span class="text-[10px] font-bold text-sky-900 block">VALOR</span>
+                                <span class="text-xl font-black text-emerald-700">R$ ${f.prom_valor_num || '0,00'}</span>
+                            </div>
+                        </div>
+                        <div class="mb-4 text-xs leading-relaxed text-slate-800">
+                            Ao(s) <strong>${f.cidade_data ? f.cidade_data.split(',')[0] || '---' : '---'}</strong>, pagarei(emos) por esta única via de <strong>NOTA PROMISSÓRIA</strong> a quantia de <strong>R$ ${f.prom_valor_num || '0,00'}</strong> (${f.prom_valor_ext || '---'}), em moeda corrente nacional, pagável à pessoa de <strong>${f.cred_nome || '---'}</strong>, portador(a) do CPF: ${f.cred_cpf || '---'}.
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-[11px] bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4">
+                            <div><strong>Emitente (Devedor):</strong><br>${f.devedor_nome || '---'}<br>CPF: ${f.devedor_cpf || '---'}</div>
+                            <div><strong>Endereço:</strong><br>${f.devedor_end || '---'}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Clean signature area suitable for electronic (GOV.BR) or handwritten signatures
+            const signName = f.emit_nome || f.devedor_nome || 'Nome do Emitente / Signatário';
+            const signCpf = f.emit_cpf || f.devedor_cpf || '000.000.000-00';
+
+            const signatureHTML = `
+                <div class="mt-10 pt-6 border-t border-slate-300">
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="w-64 border-b border-slate-800 pb-8 mb-2"></div>
+                        <p class="font-bold text-xs text-slate-900">${signName}</p>
+                        <p class="text-[11px] text-slate-600 font-mono">CPF: ${signCpf}</p>
+                    </div>
+                </div>
+            `;
+
+            return `<div class="pdf-container p-6 bg-white rounded-xl shadow-sm">${bodyHTML}${signatureHTML}</div>`;
+        }
+
+        // Preview document
+        function previewDocument(tab) {
+            const data = getFormData(tab);
+            const htmlContent = buildDocumentHTML(data);
+            const previewArea = document.getElementById('preview-content-area');
+            const previewModal = document.getElementById('preview-modal');
+            if (previewArea && previewModal) {
+                previewArea.innerHTML = htmlContent;
+                previewModal.classList.remove('hidden');
+            }
+        }
+
+        function closePreviewModal() {
+            const previewModal = document.getElementById('preview-modal');
+            if (previewModal) previewModal.classList.add('hidden');
+        }
+
+        // Generate and download PDF with robust error handling and formatting
+        function generatePDF(tab) {
+            try {
+                const data = getFormData(tab);
+                const htmlContent = buildDocumentHTML(data);
+                
+                // Create temporary container for PDF compilation with exact A4 dimensions in mm
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlContent;
+                tempDiv.style.width = '190mm';
+                tempDiv.style.padding = '10mm';
+                tempDiv.style.background = '#ffffff';
+                tempDiv.style.color = '#1e293b';
+                tempDiv.style.fontFamily = 'Inter, sans-serif';
+                tempDiv.style.boxSizing = 'border-box';
+                document.body.appendChild(tempDiv);
+
+                const opt = {
+                    margin:       10,
+                    filename:     `Excellington_${tab}_${Date.now()}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { 
+                        scale: 2, 
+                        useCORS: true, 
+                        letterRendering: true,
+                        scrollY: 0 
+                    },
+                    jsPDF:        { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true 
+                    }
+                };
+
+                html2pdf().set(opt).from(tempDiv).save().then(() => {
+                    if (document.body.contains(tempDiv)) {
+                        document.body.removeChild(tempDiv);
+                    }
+                    showToast("PDF gerado e baixado com sucesso!", "success");
+                }).catch(err => {
+                    console.error("html2pdf error:", err);
+                    if (document.body.contains(tempDiv)) {
+                        document.body.removeChild(tempDiv);
+                    }
+                    showToast("Erro ao gerar PDF. Verifique os dados preenchidos.", "error");
+                });
+            } catch (e) {
+                console.error("generatePDF exception:", e);
+                showToast("Erro ao processar a geração do PDF.", "error");
+            }
+        }
+
+        function confirmAndDownloadFromPreview() {
+            closePreviewModal();
+            generatePDF(currentTab);
+        }
+
+        // Terms modal controls
+        function openTermsModal() {
+            const termsModal = document.getElementById('terms-modal');
+            if (termsModal) termsModal.classList.remove('hidden');
+        }
+        function closeTermsModal() {
+            const termsModal = document.getElementById('terms-modal');
+            if (termsModal) termsModal.classList.add('hidden');
+        }
+
+        // Immediate browser window closure handler
+        function closeAppWindow() {
+            if (confirm("Deseja realmente fechar a janela do aplicativo?")) {
+                window.close();
+                setTimeout(() => {
+                    showToast("Seu navegador bloqueou o fechamento automático. Feche esta aba manualmente.", "error");
+                }, 300);
+            }
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-600' : 'bg-rose-600';
+            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+            
+            toast.className = `${bgClass} text-white px-5 py-3 rounded-2xl shadow-xl font-medium text-sm flex items-center space-x-3 pointer-events-auto transition transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 50);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 300);
+            }, 3500);
+        }
+
+        // Initialize default tab on window load
+        window.onload = function() {
+            switchTab('orcamento');
+        };
+    </script>
+</body>
+</html>
