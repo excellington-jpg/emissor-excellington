@@ -1,4 +1,4 @@
-﻿
+
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-full">
 <head>
@@ -74,7 +74,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-excellington-900">Excellington</h1>
-                    <p class="text-xs sm:text-sm text-excellington-600 font-medium">Emissão de Orçamentos, Recibos e Promissórias (Pessoa Física)</p>
+                    <p class="text-xs sm:text-sm text-excellington-600 font-medium">Orçamentos, Recibos e Promissórias (Pessoa Física)</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2 sm:space-x-3">
@@ -94,17 +94,21 @@
         
         <!-- Tab Navigation Bar -->
         <div class="flex flex-wrap gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-excellington-200">
-            <button onclick="switchTab('orcamento')" id="btn-tab-orcamento" class="flex-1 min-w-[140px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 bg-excellington-600 text-white shadow-md">
+            <button onclick="switchTab('orcamento')" id="btn-tab-orcamento" class="flex-1 min-w-[130px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 bg-excellington-600 text-white shadow-md">
                 <i class="fa-solid fa-calculator"></i>
                 <span>Orçamentos</span>
             </button>
-            <button onclick="switchTab('recibo')" id="btn-tab-recibo" class="flex-1 min-w-[140px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 text-excellington-700 hover:bg-excellington-100">
+            <button onclick="switchTab('recibo')" id="btn-tab-recibo" class="flex-1 min-w-[130px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 text-excellington-700 hover:bg-excellington-100">
                 <i class="fa-solid fa-receipt"></i>
                 <span>Recibos</span>
             </button>
-            <button onclick="switchTab('promissoria')" id="btn-tab-promissoria" class="flex-1 min-w-[140px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 text-excellington-700 hover:bg-excellington-100">
+            <button onclick="switchTab('promissoria')" id="btn-tab-promissoria" class="flex-1 min-w-[130px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 text-excellington-700 hover:bg-excellington-100">
                 <i class="fa-solid fa-file-contract"></i>
-                <span>Notas Promissórias</span>
+                <span>Promissórias</span>
+            </button>
+            <button onclick="switchTab('historico')" id="btn-tab-historico" class="flex-1 min-w-[130px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 text-excellington-700 hover:bg-excellington-100">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Histórico</span>
             </button>
         </div>
 
@@ -124,14 +128,12 @@
                         <label class="block text-sm font-semibold text-excellington-800 mb-2">Modelo de Orçamento</label>
                         <select id="orcamento-modelo" onchange="updateTemplateFields('orcamento')" class="w-full bg-excellington-50 border border-excellington-200 rounded-xl px-4 py-3 text-excellington-900 focus:outline-none focus:ring-2 focus:ring-excellington-500 font-medium">
                             <option value="servico">Modelo 1: Prestação de Serviços (Autônomo / Particular)</option>
-                            <option value="bem">Modelo 2: Venda de Bem Móvel (Ex: Veículo, Eletrodoméstico, etc.)</option>
+                            <option value="bem">Modelo 2: Venda de Bem Móvel (Ex: Veículo, Aparelho, etc.)</option>
                         </select>
                     </div>
 
                     <!-- Dynamic Form Container for Orcamento -->
-                    <div id="form-fields-orcamento" class="space-y-4">
-                        <!-- Injected via JavaScript -->
-                    </div>
+                    <div id="form-fields-orcamento" class="space-y-4"></div>
 
                     <!-- Action buttons -->
                     <div class="flex flex-wrap gap-4 pt-4 border-t border-excellington-100">
@@ -167,9 +169,7 @@
                     </div>
 
                     <!-- Dynamic Form Container for Recibo -->
-                    <div id="form-fields-recibo" class="space-y-4">
-                        <!-- Injected via JavaScript -->
-                    </div>
+                    <div id="form-fields-recibo" class="space-y-4"></div>
 
                     <!-- Action buttons -->
                     <div class="flex flex-wrap gap-4 pt-4 border-t border-excellington-100">
@@ -204,9 +204,7 @@
                     </div>
 
                     <!-- Dynamic Form Container for Promissoria -->
-                    <div id="form-fields-promissoria" class="space-y-4">
-                        <!-- Injected via JavaScript -->
-                    </div>
+                    <div id="form-fields-promissoria" class="space-y-4"></div>
 
                     <!-- Action buttons -->
                     <div class="flex flex-wrap gap-4 pt-4 border-t border-excellington-100">
@@ -222,11 +220,39 @@
                 </div>
             </div>
 
+            <!-- HISTÓRICO TAB CONTENT -->
+            <div id="tab-historico" class="document-tab hidden bg-white rounded-3xl shadow-sm border border-excellington-200 p-6 sm:p-8">
+                <div class="mb-6 border-b border-excellington-100 pb-4 flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-excellington-900 flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-excellington-600"></i> Histórico de Documentos Gerados
+                        </h2>
+                        <p class="text-sm text-excellington-600 mt-1">Consulte, baixe novamente em PDF ou faça backup dos seus documentos salvos no dispositivo.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="exportHistoryBackup()" class="px-4 py-2 bg-excellington-100 hover:bg-excellington-200 text-excellington-800 font-semibold text-xs rounded-xl transition flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-download"></i> Baixar Backup (.json)
+                        </button>
+                        <label class="px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-800 font-semibold text-xs rounded-xl transition flex items-center gap-2 cursor-pointer shadow-sm">
+                            <i class="fa-solid fa-upload"></i> Restaurar Backup
+                            <input type="file" accept=".json" onchange="importHistoryBackup(event)" class="hidden">
+                        </label>
+                        <button onclick="clearHistory()" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs rounded-xl transition flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-trash-can"></i> Limpar Histórico
+                        </button>
+                    </div>
+                </div>
+
+                <div id="historico-list" class="space-y-4">
+                    <!-- Injected via JavaScript -->
+                </div>
+            </div>
+
         </div>
     </main>
 
     <footer class="bg-white border-t border-excellington-200 py-6 mt-12 text-center text-xs text-excellington-600">
-        <p>Orçamentos, Recibos e Promissórias Excellington &copy; 2026. Todos os dados são processados e armazenados localmente no seu dispositivo.</p>
+        <p>Orçamentos, Recibos e Promissórias Excellington &copy; 2026. Armazenamento local seguro no seu dispositivo.</p>
     </footer>
 
     <!-- PREVIEW MODAL -->
@@ -269,10 +295,9 @@
             </div>
             
             <div class="p-6 overflow-y-auto flex-grow space-y-4 text-sm text-excellington-800">
-                <p><strong>1. Natureza da Aplicação:</strong> O aplicativo <em>Orçamentos, Recibos e Promissórias Excellington</em> foi desenvolvido estritamente para facilitar a emissão de documentos particulares entre pessoas físicas (sem exigência de CNPJ, não configurando nota fiscal eletrônica ou cupom fiscal obrigatório para empresas).</p>
-                <p><strong>2. Armazenamento Local de Dados:</strong> Todos os dados inseridos nos campos são processados exclusivamente no navegador do usuário e podem ser salvos no armazenamento local (<small>localStorage</small>) do seu próprio dispositivo. Nenhum dado é enviado, coletado ou armazenado em servidores externos.</p>
-                <p><strong>3. Responsabilidade Jurídica:</strong> Os modelos fornecidos servem como minuta padrão. As partes envolvidas na transação são inteiramente responsáveis pela veracidade das informações, cumprimento de obrigações e validade jurídica do negócio pactuado.</p>
-                <p><strong>4. Assinatura:</strong> Os documentos gerados possuem espaço adequado para aposição de assinatura manuscrita (em caso de impressão) ou assinatura eletrônica (como GOV.BR).</p>
+                <p><strong>1. Natureza da Aplicação:</strong> O aplicativo <em>Orçamentos, Recibos e Promissórias Excellington</em> foi desenvolvido exclusivamente para facilitar a emissão de documentos particulares entre pessoas físicas (sem exigência de CNPJ, não configurando nota fiscal eletrônica).</p>
+                <p><strong>2. Armazenamento no Dispositivo:</strong> Todos os dados inseridos e o histórico de documentos emitidos são salvos localmente no armazenamento do seu próprio dispositivo. É possível exportar backups em formato JSON para garantir a segurança dos seus dados.</p>
+                <p><strong>3. Responsabilidade Jurídica:</strong> Os modelos fornecidos servem como minuta padrão. As partes envolvidas na transação são inteiramente responsáveis pela veracidade das informações e validade jurídica do negócio pactuado.</p>
             </div>
 
             <div class="px-6 py-4 bg-excellington-50 border-t border-excellington-200 flex justify-end">
@@ -400,18 +425,22 @@
         // Switch between tabs
         function switchTab(tabName) {
             currentTab = tabName;
-            ['orcamento', 'recibo', 'promissoria'].forEach(t => {
+            ['orcamento', 'recibo', 'promissoria', 'historico'].forEach(t => {
                 const tabEl = document.getElementById(`tab-${t}`);
                 const btnEl = document.getElementById(`btn-tab-${t}`);
                 if (t === tabName) {
                     tabEl.classList.remove('hidden');
-                    btnEl.className = "flex-1 min-w-[140px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 bg-excellington-600 text-white shadow-md";
+                    btnEl.className = "flex-1 min-w-[130px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 bg-excellington-600 text-white shadow-md";
                 } else {
                     tabEl.classList.add('hidden');
-                    btnEl.className = "flex-1 min-w-[140px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 text-excellington-700 hover:bg-excellington-100";
+                    btnEl.className = "flex-1 min-w-[130px] py-3 px-4 rounded-xl font-semibold text-sm transition flex items-center justify-center space-x-2 text-excellington-700 hover:bg-excellington-100";
                 }
             });
-            updateTemplateFields(tabName);
+            if (tabName === 'historico') {
+                renderHistory();
+            } else {
+                updateTemplateFields(tabName);
+            }
         }
 
         // Render dynamic form fields based on selected template
@@ -576,14 +605,13 @@
                 `;
             }
 
-            // Clean signature area suitable for electronic (GOV.BR) or handwritten signatures
             const signName = f.emit_nome || f.devedor_nome || 'Nome do Emitente / Signatário';
             const signCpf = f.emit_cpf || f.devedor_cpf || '000.000.000-00';
 
             const signatureHTML = `
                 <div class="mt-10 pt-6 border-t border-slate-300">
                     <div class="flex flex-col items-center justify-center">
-                        <div class="w-64 border-b border-slate-800 pb-8 mb-2"></div>
+                        <div class="w-72 border-b border-slate-800 pb-12 mb-2"></div>
                         <p class="font-bold text-xs text-slate-900">${signName}</p>
                         <p class="text-[11px] text-slate-600 font-mono">CPF: ${signCpf}</p>
                     </div>
@@ -610,13 +638,15 @@
             if (previewModal) previewModal.classList.add('hidden');
         }
 
-        // Generate and download PDF with robust error handling and formatting
+        // Generate and download PDF to device
         function generatePDF(tab) {
             try {
                 const data = getFormData(tab);
                 const htmlContent = buildDocumentHTML(data);
                 
-                // Create temporary container for PDF compilation with exact A4 dimensions in mm
+                // Automatically save to local history for record keeping
+                saveToHistory(data, htmlContent);
+
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = htmlContent;
                 tempDiv.style.width = '190mm';
@@ -649,7 +679,7 @@
                     if (document.body.contains(tempDiv)) {
                         document.body.removeChild(tempDiv);
                     }
-                    showToast("PDF gerado e baixado com sucesso!", "success");
+                    showToast("PDF baixado com sucesso para o dispositivo!", "success");
                 }).catch(err => {
                     console.error("html2pdf error:", err);
                     if (document.body.contains(tempDiv)) {
@@ -668,6 +698,179 @@
             generatePDF(currentTab);
         }
 
+        // History Management Functions
+        function saveToHistory(data, htmlContent) {
+            try {
+                let history = JSON.parse(localStorage.getItem('excellington_history') || '[]');
+                const item = {
+                    id: 'doc_' + Date.now(),
+                    date: new Date().toLocaleString('pt-BR'),
+                    tab: data.tab,
+                    title: data.title,
+                    summary: getDocumentSummary(data),
+                    htmlContent: htmlContent
+                };
+                history.unshift(item);
+                if (history.length > 50) history = history.slice(0, 50);
+                localStorage.setItem('excellington_history', JSON.stringify(history));
+            } catch(e) {
+                console.error("Error saving history:", e);
+            }
+        }
+
+        function getDocumentSummary(data) {
+            const f = data.fields;
+            if (data.tab === 'orcamento') {
+                return `Para: ${f.cli_nome || 'Cliente'} | Valor: R$ ${f.serv_valor || f.bem_valor || '0,00'}`;
+            } else if (data.tab === 'recibo') {
+                return `Pagador: ${f.rec_recebedor || f.loc_inquilino || f.serv_contratante || '---'} | Valor: R$ ${f.rec_valor_num || f.loc_valor_num || f.serv_val_num || '0,00'}`;
+            } else if (data.tab === 'promissoria') {
+                return `Devedor: ${f.devedor_nome || '---'} | Valor: R$ ${f.prom_valor_num || '0,00'}`;
+            }
+            return data.title;
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historico-list');
+            if (!container) return;
+            const history = JSON.parse(localStorage.getItem('excellington_history') || '[]');
+            
+            if (history.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-excellington-50 rounded-2xl border border-dashed border-excellington-200 text-excellington-600">
+                        <i class="fa-solid fa-folder-open text-3xl mb-3"></i>
+                        <p class="font-semibold text-sm">Nenhum documento gerado no histórico ainda.</p>
+                        <p class="text-xs mt-1">Os documentos emitidos aparecerão aqui automaticamente.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            history.forEach(item => {
+                const tabBadge = item.tab === 'orcamento' ? 'Orçamento' : (item.tab === 'recibo' ? 'Recibo' : 'Promissória');
+                const badgeColor = item.tab === 'orcamento' ? 'bg-sky-100 text-sky-800' : (item.tab === 'recibo' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800');
+                
+                html += `
+                    <div class="bg-white p-4 rounded-2xl border border-excellington-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${badgeColor}">${tabBadge}</span>
+                                <span class="text-xs text-slate-500"><i class="fa-regular fa-clock"></i> ${item.date}</span>
+                            </div>
+                            <h4 class="font-bold text-sm text-excellington-900">${item.title}</h4>
+                            <p class="text-xs text-slate-600">${item.summary}</p>
+                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                            <button onclick="previewHistoryItem('${item.id}')" class="px-3.5 py-2 bg-excellington-100 hover:bg-excellington-200 text-excellington-800 font-semibold text-xs rounded-xl transition flex items-center gap-1.5" title="Visualizar">
+                                <i class="fa-solid fa-eye"></i> Visualizar
+                            </button>
+                            <button onclick="downloadHistoryItemPDF('${item.id}')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl transition flex items-center gap-1.5" title="Baixar PDF">
+                                <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+                            </button>
+                            <button onclick="deleteHistoryItem('${item.id}')" class="p-2 text-rose-600 hover:bg-rose-50 rounded-xl transition" title="Excluir do Histórico">
+                                <i class="fa-solid fa-trash-can text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function previewHistoryItem(id) {
+            const history = JSON.parse(localStorage.getItem('excellington_history') || '[]');
+            const item = history.find(h => h.id === id);
+            if (!item) return;
+            const previewArea = document.getElementById('preview-content-area');
+            const previewModal = document.getElementById('preview-modal');
+            if (previewArea && previewModal) {
+                previewArea.innerHTML = item.htmlContent;
+                previewModal.classList.remove('hidden');
+            }
+        }
+
+        function downloadHistoryItemPDF(id) {
+            const history = JSON.parse(localStorage.getItem('excellington_history') || '[]');
+            const item = history.find(h => h.id === id);
+            if (!item) return;
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = item.htmlContent;
+            tempDiv.style.width = '190mm';
+            tempDiv.style.padding = '10mm';
+            tempDiv.style.background = '#ffffff';
+            tempDiv.style.color = '#1e293b';
+            tempDiv.style.fontFamily = 'Inter, sans-serif';
+            tempDiv.style.boxSizing = 'border-box';
+            document.body.appendChild(tempDiv);
+
+            const opt = {
+                margin:       10,
+                filename:     `Excellington_${item.tab}_${Date.now()}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
+            };
+
+            html2pdf().set(opt).from(tempDiv).save().then(() => {
+                if (document.body.contains(tempDiv)) document.body.removeChild(tempDiv);
+                showToast("PDF baixado com sucesso para o dispositivo!", "success");
+            }).catch(err => {
+                if (document.body.contains(tempDiv)) document.body.removeChild(tempDiv);
+                showToast("Erro ao gerar PDF.", "error");
+            });
+        }
+
+        function deleteHistoryItem(id) {
+            let history = JSON.parse(localStorage.getItem('excellington_history') || '[]');
+            history = history.filter(h => h.id !== id);
+            localStorage.setItem('excellington_history', JSON.stringify(history));
+            renderHistory();
+            showToast("Documento removido do histórico.", "success");
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('excellington_history');
+            renderHistory();
+            showToast("Histórico limpo com sucesso.", "success");
+        }
+
+        function exportHistoryBackup() {
+            const history = localStorage.getItem('excellington_history') || '[]';
+            const blob = new Blob([history], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Excellington_Historico_Backup_${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("Backup do histórico baixado para o dispositivo!", "success");
+        }
+
+        function importHistoryBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        localStorage.setItem('excellington_history', JSON.stringify(imported));
+                        renderHistory();
+                        showToast("Histórico restaurado com sucesso!", "success");
+                    } else {
+                        showToast("Arquivo de backup inválido.", "error");
+                    }
+                } catch(err) {
+                    showToast("Erro ao ler o arquivo JSON.", "error");
+                }
+            };
+            reader.readAsText(file);
+        }
+
         // Terms modal controls
         function openTermsModal() {
             const termsModal = document.getElementById('terms-modal');
@@ -680,12 +883,10 @@
 
         // Immediate browser window closure handler
         function closeAppWindow() {
-            if (confirm("Deseja realmente fechar a janela do aplicativo?")) {
-                window.close();
-                setTimeout(() => {
-                    showToast("Seu navegador bloqueou o fechamento automático. Feche esta aba manualmente.", "error");
-                }, 300);
-            }
+            window.close();
+            setTimeout(() => {
+                showToast("Seu navegador bloqueou o fechamento automático. Feche esta aba manualmente.", "error");
+            }, 300);
         }
 
         // Toast notification system
